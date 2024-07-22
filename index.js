@@ -8,6 +8,26 @@ import { exec } from "child_process";
 import {stdout, stderr} from "process";
 const app = express();
 
+
+app.use(cors({
+    origin: ["http://localhost:5173","https://video-streaming-pow-ten.vercel.app/"],
+    credentials: true,
+}));
+
+app.use((req, res, next) => {
+    res.header("Access-Control-Allow-Origin", "http://localhost:5173");
+    res.header(
+        "Access-Control-Allow-Headers",
+        "Origin, X-Requested-With, X-Requested-By, Content-Type, Accept, Authorization"
+    )
+    next();
+});
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use("/uploads", express.static("uploads"));
+
+
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
         cb(null, "./uploads")
@@ -50,26 +70,6 @@ app.post("/upload", uploads.single("file"), (req, res) => {
     });
  })
 });
-
-
-
-app.use(cors({
-    origin: ["http://localhost:5173"],
-    credentials: true,
-}));
-
-app.use((req, res, next) => {
-    res.header("Access-Control-Allow-Origin", "http://localhost:5173");
-    res.header(
-        "Access-Control-Allow-Headers",
-        "Origin, X-Requested-With, X-Requested-By, Content-Type, Accept, Authorization"
-    )
-    next();
-});
-
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use("/uploads", express.static("uploads"));
 
 app.get("/", (req, res) => {
     res.json({
